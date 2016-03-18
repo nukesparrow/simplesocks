@@ -1,8 +1,4 @@
 
-#ifdef STATIC_ANL
-#include <anl.h>
-#endif
-
 #define _GNU_SOURCE
 
 #include <stdio.h>
@@ -15,7 +11,6 @@
 #include <time.h>
 #include <fcntl.h>
 #include <errno.h>
-
 #ifdef STATIC_ANL
 #include <anl.h>
 #endif
