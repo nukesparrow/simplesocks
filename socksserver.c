@@ -28,7 +28,7 @@ static ssize_t send_nosignal(int fd, const void *buf, size_t n) {
         ssize_t nw = send(fd, buf, n, MSG_NOSIGNAL);
         
         if (nw <= 0) {
-            return nw == -1 && tw == 0 ? -1 : tw;
+            return nw == -1 && tw == 0 ? (ssize_t)-1 : tw;
         }
         
         tw += nw;
@@ -115,12 +115,11 @@ int socks_server_start(socks_server_t * s, struct sockaddr * addr, socklen_t add
 
 static int clients_connected = 0;
 
-static void dumpcc() {
-    debugf("Clients connected: %d\n", clients_connected);
-}
+#define dumpcc() { debugf("Clients connected: %d\n", clients_connected); }
 
 static void handle_new_socket(socks_server_t * s, int sock, struct sockaddr * addr, socklen_t addr_len) {
-    if (s->peer_filter != NULL && !(*s->peer_filter)(s->peer_filter_closure, addr, addr_len)) {
+    if (s->peer_filter != NULL && !s->peer_filter(s->peer_filter_closure, addr, addr_len)) {
+        WARN_IFM1(send_nosignal(sock, "\x05\xff", 2));
         WARN_IFM1(close(sock));
         return;
     }
