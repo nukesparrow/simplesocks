@@ -27,7 +27,7 @@ run-valgrind:
 	valgrind --vgdb=yes --leak-check=full --show-leak-kinds=all ./simplesocks
 	
 splint:
-	splint +posixlib $(INCLUDES) *.c
+	splint +posixlib $(INCLUDES) socksserver.c
 
 clean:
 	-rm -f simplesocks main.o simplesocks.a $(objects)
