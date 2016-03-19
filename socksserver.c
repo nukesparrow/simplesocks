@@ -139,6 +139,9 @@ static void handle_new_socket(socks_server_t * s, int sock, struct sockaddr * ad
     conn->addr = addr;
     conn->addr_len = addr_len;
     
+    conn->resolve_gaicb.ar_result = NULL;
+    conn->resolve_gaicb_ptr = &conn->resolve_gaicb;
+    
     clients_connected++;
     dumpcc();
 }
@@ -267,7 +270,7 @@ static void resolve_addr_complete_ifready(socks_server_connection_t * conn) {
         setconnectaddr(conn, conn->resolve_gaicb.ar_result);
 
         freeaddrinfo(conn->resolve_gaicb.ar_result);
-        conn->resolve_gaicb_ptr = NULL;
+        conn->resolve_gaicb.ar_result = NULL;
 
         conn->stage = CONNSTAGE_SOCK5CONNECT;
         
@@ -308,8 +311,6 @@ static void resolve_addr_start(socks_server_connection_t * conn) {
     conn->resolve_gaicb.ar_service = NULL;
     conn->resolve_gaicb.ar_request = NULL;
     
-    conn->resolve_gaicb_ptr = &conn->resolve_gaicb;
-
     int r;
     
     conn->stage = CONNSTAGE_SOCK5RESOLUTION_INPROGRESS;
